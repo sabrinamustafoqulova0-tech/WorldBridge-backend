@@ -6,6 +6,7 @@ from models.checklist import ChecklistItem
 from models.country import Country
 from models.faq import FAQ
 from models.ai_chat import AIChatMessage
+from models.program_suggestion import ProgramSuggestion, SuggestionStatus
 
 __all__ = [
     "User",
@@ -18,4 +19,6 @@ __all__ = [
     "Country",
     "FAQ",
     "AIChatMessage",
+    "ProgramSuggestion",
+    "SuggestionStatus",
 ]

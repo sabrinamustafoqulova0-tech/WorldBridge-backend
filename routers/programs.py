@@ -10,10 +10,12 @@ from models.user import User
 from schemas.program import (
     ProgramCreate,
     ProgramListResponse,
+    ProgramPublicResponse,
     ProgramResponse,
     ProgramUpdate,
 )
 from utils.dependencies import get_current_admin
+from utils.i18n import localize, PROGRAM_I18N_FIELDS
 
 router = APIRouter(prefix="/programs", tags=["Programs"])
 
@@ -26,6 +28,7 @@ async def list_programs(
     size: int = Query(12, ge=1, le=100),
     category: Optional[ProgramCategory] = None,
     search: Optional[str] = Query(None, max_length=100),
+    lang: str = Query(default="ru"),
     db: AsyncSession = Depends(get_db),
 ):
     """List published programs with optional category filter and full-text search."""
@@ -42,7 +45,8 @@ async def list_programs(
         base.order_by(Program.created_at.desc()).offset((page - 1) * size).limit(size)
     )
     programs = list(result.scalars().all())
-    return ProgramListResponse(items=programs, total=total, page=page, size=size)
+    items = [ProgramPublicResponse.model_validate(localize(p, lang, PROGRAM_I18N_FIELDS)) for p in programs]
+    return ProgramListResponse(items=items, total=total, page=page, size=size)
 
 
 # ── Admin endpoints ───────────────────────────────────────────────────────────
@@ -71,7 +75,11 @@ async def list_all_programs_admin(
 
 
 @router.get("/{slug}", response_model=ProgramResponse)
-async def get_program(slug: str, db: AsyncSession = Depends(get_db)):
+async def get_program(
+    slug: str,
+    lang: str = Query(default="ru"),
+    db: AsyncSession = Depends(get_db),
+):
     """Get a single published program by its slug. Increments view counter."""
     result = await db.execute(
         select(Program).where(Program.slug == slug, Program.is_published.is_(True))
@@ -82,7 +90,7 @@ async def get_program(slug: str, db: AsyncSession = Depends(get_db)):
     program.views_count += 1
     await db.flush()
     await db.refresh(program)
-    return program
+    return ProgramResponse.model_validate(localize(program, lang, PROGRAM_I18N_FIELDS))
 
 
 @router.post("", response_model=ProgramResponse, status_code=status.HTTP_201_CREATED)

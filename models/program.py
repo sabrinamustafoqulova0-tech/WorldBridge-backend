@@ -41,6 +41,9 @@ class Program(Base):
     slug: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
     country_slug: Mapped[str | None] = mapped_column(String(10), index=True, nullable=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
+    title_en: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    title_tg: Mapped[str | None] = mapped_column(String(255), nullable=True)
+
     category: Mapped[ProgramCategory] = mapped_column(
         Enum(ProgramCategory, name="program_category"), nullable=False, index=True
     )
@@ -50,8 +53,16 @@ class Program(Base):
         default=ProgramLevel.BEGINNER,
     )
     short_description: Mapped[str] = mapped_column(String(500), nullable=False)
+    short_description_en: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    short_description_tg: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
     description: Mapped[str] = mapped_column(Text, nullable=False)
+    description_en: Mapped[str | None] = mapped_column(Text, nullable=True)
+    description_tg: Mapped[str | None] = mapped_column(Text, nullable=True)
+
     full_description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    full_description_en: Mapped[str | None] = mapped_column(Text, nullable=True)
+    full_description_tg: Mapped[str | None] = mapped_column(Text, nullable=True)
     duration_months: Mapped[int | None] = mapped_column(Integer, nullable=True)
     min_age: Mapped[int | None] = mapped_column(Integer, nullable=True)
     max_age: Mapped[int | None] = mapped_column(Integer, nullable=True)

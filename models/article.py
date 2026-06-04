@@ -13,8 +13,16 @@ class Article(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     slug: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
+    title_en: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    title_tg: Mapped[str | None] = mapped_column(String(255), nullable=True)
+
     excerpt: Mapped[str] = mapped_column(String(500), nullable=False)
+    excerpt_en: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    excerpt_tg: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
     content: Mapped[str] = mapped_column(Text, nullable=False)
+    content_en: Mapped[str | None] = mapped_column(Text, nullable=True)
+    content_tg: Mapped[str | None] = mapped_column(Text, nullable=True)
     cover_image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     author_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True

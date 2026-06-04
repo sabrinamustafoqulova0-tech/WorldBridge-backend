@@ -21,26 +21,62 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 
 # ── Internal imports ──────────────────────────────────────────────────────────
 from config import settings
 from database import Base, engine
 
 # All feature routers
-from routers import auth, articles, calculator, checklists, countries, favorites, programs, users, ai_consultant
+from routers import auth, articles, calculator, checklists, countries, favorites, programs, users, ai_consultant, suggestions
 
 
 # ── Lifespan (startup / shutdown) ─────────────────────────────────────────────
 
+_I18N_COLUMNS: list[tuple[str, str, str]] = [
+    # (table, column, sqlite_type)
+    ("programs",  "title_en",             "TEXT"),
+    ("programs",  "title_tg",             "TEXT"),
+    ("programs",  "short_description_en", "TEXT"),
+    ("programs",  "short_description_tg", "TEXT"),
+    ("programs",  "description_en",       "TEXT"),
+    ("programs",  "description_tg",       "TEXT"),
+    ("programs",  "full_description_en",  "TEXT"),
+    ("programs",  "full_description_tg",  "TEXT"),
+    ("articles",  "title_en",             "TEXT"),
+    ("articles",  "title_tg",             "TEXT"),
+    ("articles",  "excerpt_en",           "TEXT"),
+    ("articles",  "excerpt_tg",           "TEXT"),
+    ("articles",  "content_en",           "TEXT"),
+    ("articles",  "content_tg",           "TEXT"),
+    ("faqs",      "question_en",          "TEXT"),
+    ("faqs",      "question_tg",          "TEXT"),
+    ("faqs",      "answer_en",            "TEXT"),
+    ("faqs",      "answer_tg",            "TEXT"),
+    ("countries", "name_tg",              "VARCHAR(100)"),
+    ("countries", "description_tg",       "TEXT"),
+]
+
+
+async def _apply_i18n_migrations(conn) -> None:
+    """Safely add i18n columns to existing tables (idempotent)."""
+    for table, column, col_type in _I18N_COLUMNS:
+        try:
+            await conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {col_type}"))
+        except Exception:
+            pass  # column already exists — safe to ignore
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    On startup  → create all tables that don't exist yet.
+    On startup  → create all tables that don't exist yet, then add i18n columns.
                   In production, use `alembic upgrade head` instead.
     On shutdown → gracefully close the DB connection pool.
     """
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await _apply_i18n_migrations(conn)
     yield
     await engine.dispose()
 
@@ -103,6 +139,7 @@ def create_app() -> FastAPI:
     app.include_router(calculator.router,     prefix=PREFIX)   # /api/v1/calculator
     app.include_router(checklists.router,     prefix=PREFIX)   # /api/v1/checklists
     app.include_router(ai_consultant.router,  prefix=PREFIX)   # /api/v1/ai
+    app.include_router(suggestions.router,    prefix=PREFIX)   # /api/v1/suggestions
 
     # ── Health check ──────────────────────────────────────────────────────────
 

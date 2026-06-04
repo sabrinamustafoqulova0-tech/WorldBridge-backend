@@ -85,11 +85,14 @@ async def seed_countries():
             exists = (await db.execute(select(Country).where(Country.slug == data["slug"]))).scalar_one_or_none()
             if not exists:
                 db.add(Country(**data))
-                print(f"✅ Country: {data['name_en']}")
+                print(f"[+] Created: {data['name_en']}")
             else:
-                print(f"ℹ️  Country {data['slug']} already exists")
+                # Always update all fields so re-running fixes stale data (e.g. wrong flag_emoji)
+                for key, value in data.items():
+                    setattr(exists, key, value)
+                print(f"[~] Updated: {data['name_en']}")
         await db.commit()
-    print("🌍 Countries seeded!")
+    print("[OK] Countries seeded!")
 
 if __name__ == "__main__":
     asyncio.run(seed_countries())

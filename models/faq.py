@@ -9,8 +9,15 @@ class FAQ(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     country_slug: Mapped[str] = mapped_column(String(10), index=True, nullable=False)
+
     question: Mapped[str] = mapped_column(Text, nullable=False)
+    question_en: Mapped[str | None] = mapped_column(Text, nullable=True)
+    question_tg: Mapped[str | None] = mapped_column(Text, nullable=True)
+
     answer: Mapped[str] = mapped_column(Text, nullable=False)
+    answer_en: Mapped[str | None] = mapped_column(Text, nullable=True)
+    answer_tg: Mapped[str | None] = mapped_column(Text, nullable=True)
+
     order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     created_at: Mapped[datetime] = mapped_column(

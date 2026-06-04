@@ -11,12 +11,25 @@ class ArticleCreate(BaseModel):
     content: str
     cover_image_url: Optional[str] = None
     is_published: bool = False
+    # Optional translations
+    title_en: Optional[str] = None
+    title_tg: Optional[str] = None
+    excerpt_en: Optional[str] = None
+    excerpt_tg: Optional[str] = None
+    content_en: Optional[str] = None
+    content_tg: Optional[str] = None
 
 
 class ArticleUpdate(BaseModel):
     title: Optional[str] = None
+    title_en: Optional[str] = None
+    title_tg: Optional[str] = None
     excerpt: Optional[str] = None
+    excerpt_en: Optional[str] = None
+    excerpt_tg: Optional[str] = None
     content: Optional[str] = None
+    content_en: Optional[str] = None
+    content_tg: Optional[str] = None
     cover_image_url: Optional[str] = None
     is_published: Optional[bool] = None
 

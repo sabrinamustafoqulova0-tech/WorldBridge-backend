@@ -14,6 +14,7 @@ from schemas.article import (
     ArticleUpdate,
 )
 from utils.dependencies import get_current_admin, get_current_active_user_optional
+from utils.i18n import localize, ARTICLE_I18N_FIELDS
 
 router = APIRouter(prefix="/articles", tags=["Articles"])
 
@@ -26,6 +27,7 @@ async def list_articles(
     size: int = Query(10, ge=1, le=50),
     search: Optional[str] = Query(None, max_length=100),
     admin_view: bool = Query(False),
+    lang: str = Query(default="ru"),
     db: AsyncSession = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_active_user_optional),
 ):
@@ -46,12 +48,14 @@ async def list_articles(
         base.order_by(Article.created_at.desc()).offset((page - 1) * size).limit(size)
     )
     articles = list(result.scalars().all())
-    return ArticleListResponse(items=articles, total=total, page=page, size=size)
+    items = [ArticleResponse.model_validate(localize(a, lang, ARTICLE_I18N_FIELDS)) for a in articles]
+    return ArticleListResponse(items=items, total=total, page=page, size=size)
 
 
 @router.get("/{slug}", response_model=ArticleResponse)
 async def get_article(
     slug: str,
+    lang: str = Query(default="ru"),
     db: AsyncSession = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_active_user_optional),
 ):
@@ -69,7 +73,7 @@ async def get_article(
         await db.flush()
         await db.refresh(article)
 
-    return ArticleResponse.model_validate(article)
+    return ArticleResponse.model_validate(localize(article, lang, ARTICLE_I18N_FIELDS))
 
 
 # ── Admin endpoints ───────────────────────────────────────────────────────────

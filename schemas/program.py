@@ -37,16 +37,33 @@ class ProgramBase(BaseModel):
 class ProgramCreate(ProgramBase):
     slug: str
     is_published: bool = False
+    # Optional translations
+    title_en: Optional[str] = None
+    title_tg: Optional[str] = None
+    short_description_en: Optional[str] = None
+    short_description_tg: Optional[str] = None
+    description_en: Optional[str] = None
+    description_tg: Optional[str] = None
+    full_description_en: Optional[str] = None
+    full_description_tg: Optional[str] = None
 
 
 class ProgramUpdate(BaseModel):
     title: Optional[str] = None
+    title_en: Optional[str] = None
+    title_tg: Optional[str] = None
     category: Optional[ProgramCategory] = None
     level: Optional[ProgramLevel] = None
     country_slug: Optional[str] = None
     short_description: Optional[str] = None
+    short_description_en: Optional[str] = None
+    short_description_tg: Optional[str] = None
     description: Optional[str] = None
+    description_en: Optional[str] = None
+    description_tg: Optional[str] = None
     full_description: Optional[str] = None
+    full_description_en: Optional[str] = None
+    full_description_tg: Optional[str] = None
     duration_months: Optional[int] = None
     min_age: Optional[int] = None
     max_age: Optional[int] = None
