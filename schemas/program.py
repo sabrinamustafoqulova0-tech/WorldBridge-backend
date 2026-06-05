@@ -89,9 +89,13 @@ class ProgramPublicResponse(BaseModel):
     slug: str
     country_slug: Optional[str] = None
     title: str
+    title_en: Optional[str] = None
+    title_tg: Optional[str] = None
     category: ProgramCategory
     level: ProgramLevel
     short_description: str
+    short_description_en: Optional[str] = None
+    short_description_tg: Optional[str] = None
     duration_months: Optional[int] = None
     min_age: Optional[int] = None
     max_age: Optional[int] = None
@@ -120,6 +124,14 @@ class ProgramResponse(ProgramBase):
     views_count: int
     created_at: datetime
     updated_at: datetime
+    title_en: Optional[str] = None
+    title_tg: Optional[str] = None
+    short_description_en: Optional[str] = None
+    short_description_tg: Optional[str] = None
+    description_en: Optional[str] = None
+    description_tg: Optional[str] = None
+    full_description_en: Optional[str] = None
+    full_description_tg: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

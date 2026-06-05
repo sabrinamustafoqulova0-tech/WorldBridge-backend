@@ -38,8 +38,14 @@ class ArticleResponse(BaseModel):
     id: int
     slug: str
     title: str
+    title_en: Optional[str] = None
+    title_tg: Optional[str] = None
     excerpt: str
+    excerpt_en: Optional[str] = None
+    excerpt_tg: Optional[str] = None
     content: str
+    content_en: Optional[str] = None
+    content_tg: Optional[str] = None
     cover_image_url: Optional[str] = None
     author_id: Optional[int] = None
     is_published: bool
