@@ -32,6 +32,8 @@ class ProgramBase(BaseModel):
     cons: Optional[str] = None
     career_opportunities: Optional[str] = None
     cover_image_url: Optional[str] = None
+cover_image_url_2: Optional[str] = None
+cover_image_url_3: Optional[str] = None
 
     # ── Enrichment fields (all nullable) ─────────────────────────────────────
     university_id: Optional[int] = None
@@ -144,6 +146,8 @@ class ProgramPublicResponse(BaseModel):
     pros: Optional[str] = None
     cost: Optional[str] = None
     cover_image_url: Optional[str] = None
+    cover_image_url_2: Optional[str] = None
+    cover_image_url_3: Optional[str] = None
     is_published: bool
     views_count: int
     created_at: datetime
