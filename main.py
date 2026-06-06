@@ -26,6 +26,7 @@ from sqlalchemy import text
 # ── Internal imports ──────────────────────────────────────────────────────────
 from config import settings
 from database import Base, engine
+import models  # noqa: F401 — загружаем все модели в Base.metadata
 
 # All feature routers
 from routers import auth, articles, calculator, checklists, countries, favorites, programs, users, ai_consultant, suggestions
