@@ -32,10 +32,13 @@ class ProgramBase(BaseModel):
     cons: Optional[str] = None
     career_opportunities: Optional[str] = None
     cover_image_url: Optional[str] = None
-cover_image_url_2: Optional[str] = None
-cover_image_url_3: Optional[str] = None
+    cover_image_url_2: Optional[str] = None
+    cover_image_url_3: Optional[str] = None
 
     # ── Enrichment fields (all nullable) ─────────────────────────────────────
+    
+    
+    
     university_id: Optional[int] = None
     university_name: Optional[str] = None
     city: Optional[str] = None
