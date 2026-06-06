@@ -16,7 +16,8 @@ class CalculatorInput(BaseModel):
     """
 
     # ── Destination ──────────────────────────────────────────────────────
-    city: str = Field(..., examples=["Berlin"], description="Target German city")
+    country: str = Field("de", description="ISO-код страны назначения (de, fr, pl, ch, ...)")
+    city: str = Field("", examples=["Berlin"], description="Город назначения (необязательно)")
 
     # ── Personal situation ────────────────────────────────────────────────
     family_members: int = Field(1, ge=1, le=10, description="Total people relocating (incl. yourself)")

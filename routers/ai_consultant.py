@@ -7,12 +7,31 @@ from typing import Optional, List
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from groq import AsyncGroq
+from config import settings
 from utils.dependencies import get_current_active_user
 from models.user import User
 from models.ai_chat import AIChatMessage
 from database import get_db
 
 router = APIRouter(prefix="/ai", tags=["AI Consultant"])
+
+_SYSTEM_PROMPT = """Ты AI-консультант платформы WorldBridge. Помогаешь пользователям из Таджикистана, Узбекистана и других стран СНГ найти программы для учёбы и работы за рубежом.
+
+Знаешь все программы: Ausbildung (дуальное обучение, стипендия 800-1200€/мес), FSJ/BFD (социальный год), Au Pair, Studium (вуз), языковые курсы, рабочие визы, волонтёрство, стажировки.
+
+Страны платформы: Германия 🇩🇪, Франция 🇫🇷, Бельгия 🇧🇪, Швейцария 🇨🇭, Австрия 🇦🇹, Польша 🇵🇱, Чехия 🇨🇿, Швеция 🇸🇪, Норвегия 🇳🇴, Финляндия 🇫🇮, Турция 🇹🇷, Китай 🇨🇳, Канада 🇨🇦, США 🇺🇸.
+
+Краткие факты:
+- Германия: Ausbildung — немецкий от A2, оплачивается; FSJ — жильё + карманные; бесплатные вузы на нем. языке
+- Франция: Au Pair, Erasmus+, английский B1+; французский повышает шансы
+- Скандинавия (Швеция, Норвегия, Финляндия): высокий уровень жизни, английский B2+, дорогой старт, но хорошие зарплаты
+- Польша/Чехия: дешёвое образование, доступные рабочие визы, английский B1
+- Канада/США: английский B2+, IELTS обязателен, высокий стартовый бюджет
+- Китай: дешёвое образование, стипендии CSC/HSK, языковые курсы с нуля
+- Турция: доступное образование, хаб между Европой и Азией, английский B1
+
+Отвечай кратко и дружелюбно. Отвечай на том языке на котором пишет пользователь. Не придумывай конкретные контакты — направляй на официальные сайты."""
 
 
 # ── Request / Response Schemas ──────────────────────────────────────────────
@@ -116,6 +135,30 @@ COUNTRY_PROFILES = {
         "min_german": 0, "min_english": 3, "min_age": 18, "max_age": 30,
         "programs": ["Work & Travel", "Au Pair", "Camp America", "Internship"],
         "budget": "high"
+    },
+    "se": {
+        "name": "Швеция", "flag": "🇸🇪",
+        "min_german": 0, "min_english": 3, "min_age": 18, "max_age": 45,
+        "programs": ["Work Permit", "Study", "Au Pair", "Internship"],
+        "budget": "high"
+    },
+    "no": {
+        "name": "Норвегия", "flag": "🇳🇴",
+        "min_german": 0, "min_english": 3, "min_age": 18, "max_age": 45,
+        "programs": ["Seasonal Work", "Study", "Work Permit", "Skilled Worker"],
+        "budget": "high"
+    },
+    "fi": {
+        "name": "Финляндия", "flag": "🇫🇮",
+        "min_german": 0, "min_english": 2, "min_age": 18, "max_age": 45,
+        "programs": ["Study", "Work Permit", "Internship", "Au Pair"],
+        "budget": "medium"
+    },
+    "cn": {
+        "name": "Китай", "flag": "🇨🇳",
+        "min_german": 0, "min_english": 2, "min_age": 18, "max_age": 40,
+        "programs": ["Study", "Language Course", "Internship", "Work Visa"],
+        "budget": "low"
     },
 }
 
@@ -309,68 +352,27 @@ async def ai_chat_message(
     )
     db.add(user_msg)
     
-    # 2. Analyze user message and generate high-quality helper response
-    q = req.content.lower()
-    
-    if "герман" in q or "deutsch" in q or "de" in q and len(q) < 5:
-        reply = (
-            "🇩🇪 **Германия** — одно из самых популярных направлений.\n\n"
-            "Здесь доступны программы:\n"
-            "• **Ausbildung** (дуальное проф. обучение, платят стипендию 800-1400€/мес)\n"
-            "• **FSJ/BFD** (социальный год для молодежи, предоставляют жилье и карманные расходы)\n"
-            "• **Studium** (высшее образование, обучение часто бесплатное на немецком)\n\n"
-            "Для большинства программ требуется немецкий язык от уровня A2 до B2."
+    # 2. Загрузить последние 9 сообщений из истории как контекст (до текущего)
+    ctx_stmt = select(AIChatMessage).where(
+        AIChatMessage.user_id == current_user.id,
+        AIChatMessage.chat_type == "chat",
+    ).order_by(AIChatMessage.created_at.desc()).limit(9)
+    ctx_result = await db.execute(ctx_stmt)
+    recent = list(reversed(ctx_result.scalars().all()))
+    messages_for_api = [{"role": m.role, "content": m.content} for m in recent]
+    # Явно добавляем текущее сообщение пользователя (ещё не сброшено в БД)
+    messages_for_api.append({"role": "user", "content": req.content})
+
+    try:
+        client = AsyncGroq(api_key=settings.GROQ_API_KEY)
+        api_response = await client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            max_tokens=1024,
+            messages=[{"role": "system", "content": _SYSTEM_PROMPT}] + messages_for_api,
         )
-    elif "виз" in q or "visa" in q:
-        reply = (
-            "📄 **Получение визы** — ключевой этап relocation-процесса.\n\n"
-            "Основные документы:\n"
-            "1. Официальное приглашение от работодателя, вуза или благотворительной организации.\n"
-            "2. Финансовые гарантии (блокированный счет, выписка из банка или спонсорское письмо).\n"
-            "3. Подтверждение владения языком (сертификаты Goethe-Institut, IELTS, TOEFL).\n"
-            "4. Медицинская страховка, покрывающая весь период пребывания."
-        )
-    elif "денег" in q or "деньги" in q or "бюджет" in q or "расход" in q or "стоимост" in q or "калькулятор" in q:
-        reply = (
-            "💰 **Планирование финансов**:\n\n"
-            "Каждая страна требует определенного бюджета на проживание. Например, в Германии на блокированном счету "
-            "необходимо иметь около 992€ в месяц. В Польше или Чехии стоимость жизни ниже (около 500-700€ в месяц).\n\n"
-            "💡 Используйте наш встроенный **Калькулятор расходов**, чтобы рассчитать точный баланс доходов и затрат!"
-        )
-    elif "язык" in q or "английск" in q or "немецк" in q or "ielts" in q or "goethe" in q:
-        reply = (
-            "🗣️ **Языковые требования**:\n\n"
-            "• **Немецкий (German)**: A2 достаточен для Au Pair и некоторых FSJ. B1-B2 требуется для Ausbildung и работы.\n"
-            "• **Английский (English)**: Сдача IELTS (5.5 - 7.0) обязательна для обучения в Канаде, США и европейских англоязычных программах.\n\n"
-            "Рекомендуем начать подготовку минимум за 6-9 месяцев до планируемого отъезда."
-        )
-    elif "канад" in q or "canada" in q:
-        reply = (
-            "🇨🇦 **Канада** предлагает прекрасные условия для иммиграции:\n\n"
-            "• **Study Permit**: Обучение в канадских колледжах с правом работы 20 часов в неделю.\n"
-            "• **Express Entry**: Балльная система для квалифицированных специалистов.\n"
-            "• **Co-op Programs**: Стажировка с интеграцией в канадский рынок труда.\n\n"
-            "Необходим хороший уровень английского (IELTS) или французского."
-        )
-    elif "сша" in q or "usa" in q or "америк" in q:
-        reply = (
-            "🇺🇸 **США** предоставляет следующие варианты:\n\n"
-            "• **Au Pair**: Программа культурного обмена для молодежи с проживанием в американской семье.\n"
-            "• **Work & Travel**: Для активных студентов вузов в летний период.\n"
-            "• **Internships**: Профессиональные стажировки по визе J-1 для молодых специалистов."
-        )
-    elif "привет" in q or "hello" in q or "здравствуй" in q:
-        reply = (
-            "Привет! 🌍 Рад пообщаться. Я могу подробно ответить на твои вопросы о переезде за рубеж. "
-            "Спроси меня про **Германию**, **Канаду**, **визовые требования**, **стоимость жизни** или **языки**!"
-        )
-    else:
-        reply = (
-            "Я записал твой вопрос! 🤖\n\n"
-            "Для успешной иммиграции важно детально изучить программы и требования. "
-            "Уточни, пожалуйста, в какую страну ты планируешь переезд (Германия, Канада, США или др.) "
-            "или какую программу рассматриваешь (учеба, работа, волонтерство)?"
-        )
+        reply = api_response.choices[0].message.content
+    except Exception:
+        reply = "Извини, AI-консультант временно недоступен. Попробуй позже или напиши нам напрямую."
 
     # Save assistant message
     assistant_msg = AIChatMessage(

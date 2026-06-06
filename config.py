@@ -51,5 +51,8 @@ class Settings(BaseSettings):
     # ── Redis (caching / rate limiting) ──────────────────────────────────
     REDIS_URL: str = "redis://localhost:6379"
 
+    # ── Groq AI ──────────────────────────────────────────────────────────
+    GROQ_API_KEY: str = ""
+
 
 settings = Settings()
