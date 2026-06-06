@@ -23,6 +23,7 @@ class Country(Base):
     region: Mapped[str] = mapped_column(String(50), nullable=False, default="Europe")
     map_x: Mapped[float] = mapped_column(nullable=False, default=50.0)
     map_y: Mapped[float] = mapped_column(nullable=False, default=40.0)
+    image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False

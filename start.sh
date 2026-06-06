@@ -9,6 +9,7 @@ async def create_tables():
         await conn.run_sync(Base.metadata.create_all)
         # Add new columns if they don't exist
         new_columns = [
+        'ALTER TABLE countries ADD COLUMN IF NOT EXISTS image_url VARCHAR(500)',
             'ALTER TABLE programs ADD COLUMN IF NOT EXISTS university_id INTEGER',
             'ALTER TABLE programs ADD COLUMN IF NOT EXISTS university_name VARCHAR',
             'ALTER TABLE programs ADD COLUMN IF NOT EXISTS city VARCHAR',

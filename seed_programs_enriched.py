@@ -1,20 +1,4 @@
-"""
-Enrich existing programs with verified data from official sources.
-
-This script links programs to universities and adds verifiable data.
-Fields left as None if not confirmed from official source.
-
-DATA POLICY:
-  - University links: verified by matching program country + category
-  - Tuition fees: ONLY if explicitly listed on official page
-  - Contact info: ONLY from official contact pages
-  - All other enrichment data: leave null until manually verified
-
-Run:
-    cd backend
-    .venv/Scripts/python.exe seed_programs_enriched.py
-"""
-
+"""Enrich programs with cover images from Unsplash."""
 import asyncio
 import sys
 import os
@@ -29,102 +13,88 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 engine = create_async_engine(DATABASE_URL, echo=False)
 Session = async_sessionmaker(engine, expire_on_commit=False)
 
-
-# Programs enrichment data
-# Only include what can be verified from official sources
-PROGRAM_ENRICHMENTS = [
-    # ── German Ausbildung programs ─────────────────────────────────────────────
-    {
-        "slug_contains": "ausbildung",
-        "country_slug": "de",
-        "application_steps": (
-            "Изучить требования к выбранной профессии и найти работодателя\n"
-            "Подготовить резюме (Lebenslauf) и мотивационное письмо на немецком\n"
-            "Отправить заявку напрямую работодателю или через Bundesagentur für Arbeit\n"
-            "Пройти собеседование (возможно онлайн для иностранных кандидатов)\n"
-            "Получить договор об обучении (Ausbildungsvertrag)\n"
-            "Оформить рабочую визу категории D в посольстве Германии\n"
-            "Зарегистрироваться в Германии (Anmeldung) после приезда"
-        ),
-        "program_faq": (
-            '[{"q": "Нужно ли знать немецкий язык?", "a": "Да, минимальный уровень B1-B2. Многие программы требуют B2. Вы можете пройти языковые курсы через DAAD или Goethe-Institut."}, '
-            '{"q": "Платит ли работодатель во время Ausbildung?", "a": "Да, вы получаете Ausbildungsvergütung (обучающую зарплату) от 600 до 1100 EUR/месяц в зависимости от профессии и года обучения."}, '
-            '{"q": "Можно ли остаться в Германии после окончания?", "a": "Да. После успешного завершения Ausbildung вы имеете право на 12 месяцев для поиска работы, а затем можете получить вид на жительство."}, '
-            '{"q": "Сколько длится Ausbildung?", "a": "Обычно 2-3 года в зависимости от профессии."}]'
-        ),
-    },
-    # ── FSJ programs ───────────────────────────────────────────────────────────
-    {
-        "slug_contains": "fsj",
-        "country_slug": "de",
-        "application_steps": (
-            "Выбрать организацию-координатора (Träger) через BMFSFJ или Bundesfreiwilligendienst\n"
-            "Связаться с организацией напрямую через их сайт\n"
-            "Заполнить анкету и пройти собеседование\n"
-            "Подписать договор об участии в программе\n"
-            "Оформить рабочую/волонтёрскую визу D\n"
-            "Начать службу (обычно 1 сентября или 1 февраля)"
-        ),
-        "program_faq": (
-            '[{"q": "Что такое FSJ?", "a": "Freiwilliges Soziales Jahr (Добровольный социальный год) — программа волонтёрской службы в социальных учреждениях Германии. Длится 6-18 месяцев."}, '
-            '{"q": "Какое пособие выплачивается?", "a": "Карманные деньги (Taschengeld) обычно 200-700 EUR/месяц плюс бесплатное жильё и питание."}, '
-            '{"q": "Каков возрастной предел?", "a": "16-27 лет для FSJ. Для BFD (Bundesfreiwilligendienst) нет возрастного ограничения сверху."}, '
-            '{"q": "Можно ли участвовать без знания немецкого?", "a": "Базовый немецкий желателен, но некоторые организации принимают кандидатов с уровнем A2 при условии прохождения курсов."}]'
-        ),
-    },
-    # ── Au Pair programs ───────────────────────────────────────────────────────
-    {
-        "slug_contains": "au-pair",
-        "country_slug": "de",
-        "application_steps": (
-            "Зарегистрироваться на платформе (AuPairWorld, Au Pair in Germany, etc.)\n"
-            "Создать привлекательный профиль с фото и мотивационным письмом\n"
-            "Найти принимающую семью и пройти несколько видео-интервью\n"
-            "Подписать договор Au Pair с семьёй\n"
-            "Получить согласие родителей (если вам менее 21 года)\n"
-            "Оформить визу Au Pair (категория D) в посольстве Германии\n"
-            "Записаться на языковые курсы заранее"
-        ),
-        "program_faq": (
-            '[{"q": "Сколько карманных денег получает Au Pair?", "a": "По закону минимум 260 EUR/месяц плюс бесплатное жильё, питание и проездной. Некоторые семьи платят больше."}, '
-            '{"q": "Сколько часов нужно работать?", "a": "Не более 30 часов в неделю, включая бесплатный вечер в неделю и 2 выходных дня."}, '
-            '{"q": "Обязательно ли посещать языковые курсы?", "a": "Да, посещение немецких курсов не менее 4 часов в неделю обязательно. Расходы обычно оплачивает семья."}, '
-            '{"q": "Можно ли продлить Au Pair?", "a": "Максимальная длительность Au Pair в Германии — 24 месяца."}]'
-        ),
-    },
-]
+PROGRAM_IMAGES = {
+    "de-fsj": "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800",
+    "de-ausbildung": "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800",
+    "de-au-pair": "https://images.unsplash.com/photo-1476703993599-0035a21b17a9?w=800",
+    "de-study": "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=800",
+    "de-chancenkarte": "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800",
+    "de-bfd": "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800",
+    "fr-au-pair": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800",
+    "fr-erasmus": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
+    "fr-vie": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800",
+    "fr-pvt": "https://images.unsplash.com/photo-1488085061387-422e29b40080?w=800",
+    "fr-study-public": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800",
+    "be-work": "https://images.unsplash.com/photo-1559113513-d5406b089b8b?w=800",
+    "be-au-pair": "https://images.unsplash.com/photo-1476703993599-0035a21b17a9?w=800",
+    "be-work-blue-card": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800",
+    "be-study-kvb": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+    "ch-hotel-internship": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800",
+    "ch-au-pair": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+    "ch-excellence-scholarship": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+    "ch-skilled-worker": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800",
+    "at-ausbildung": "https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=800",
+    "at-red-white-red": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800",
+    "at-au-pair": "https://images.unsplash.com/photo-1476703993599-0035a21b17a9?w=800",
+    "at-study": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+    "pl-work-visa": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800",
+    "pl-study": "https://images.unsplash.com/photo-1519197924294-4ba991a11128?w=800",
+    "pl-it-internship": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800",
+    "pl-seasonal-agri": "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800",
+    "cz-free-education": "https://images.unsplash.com/photo-1541849546-216549ae216d?w=800",
+    "cz-au-pair": "https://images.unsplash.com/photo-1476703993599-0035a21b17a9?w=800",
+    "cz-it-jobs": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800",
+    "cz-erasmus": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
+    "se-study": "https://images.unsplash.com/photo-1509356843151-3e7d96241e11?w=800",
+    "se-si-scholarship": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+    "se-work-permit": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800",
+    "se-berry-picking": "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800",
+    "no-fish-industry": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800",
+    "no-study": "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800",
+    "no-skilled-worker": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800",
+    "no-au-pair": "https://images.unsplash.com/photo-1476703993599-0035a21b17a9?w=800",
+    "fi-berry-picking": "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800",
+    "fi-study": "https://images.unsplash.com/photo-1538332576228-eb5b4c4de6f5?w=800",
+    "fi-work-permit": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800",
+    "fi-scholarship": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+    "tr-turkiye-burslari": "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800",
+    "tr-internship": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800",
+    "tr-language-school": "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800",
+    "tr-work-permit": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800",
+    "cn-csc-scholarship": "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=800",
+    "cn-teaching-english": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800",
+    "cn-provincial-scholarship": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+    "cn-hsk-language": "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800",
+    "ca-express-entry": "https://images.unsplash.com/photo-1517935706615-2717063c2225?w=800",
+    "ca-study-permit": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
+    "ca-iec-working-holiday": "https://images.unsplash.com/photo-1488085061387-422e29b40080?w=800",
+    "ca-pnp": "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800",
+    "us-work-travel": "https://images.unsplash.com/photo-1485738422979-f5c462d49f74?w=800",
+    "us-au-pair": "https://images.unsplash.com/photo-1476703993599-0035a21b17a9?w=800",
+    "us-j1-internship": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800",
+    "us-fulbright": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+}
 
 
 async def enrich():
     from models.program import Program
-    from models.university import University
 
     async with Session() as db:
         updated = 0
-        for enrichment in PROGRAM_ENRICHMENTS:
-            slug_contains = enrichment.get("slug_contains", "")
-            country_slug = enrichment.get("country_slug")
-
-            stmt = select(Program)
-            if slug_contains:
-                stmt = stmt.where(Program.slug.ilike(f"%{slug_contains}%"))
-            if country_slug:
-                stmt = stmt.where(Program.country_slug == country_slug)
-
-            result = await db.execute(stmt)
-            programs = result.scalars().all()
-
-            for program in programs:
-                if enrichment.get("application_steps") and not program.application_steps:
-                    program.application_steps = enrichment["application_steps"]
-                if enrichment.get("program_faq") and not program.program_faq:
-                    program.program_faq = enrichment["program_faq"]
-                if enrichment.get("university_id") and not program.university_id:
-                    program.university_id = enrichment["university_id"]
+        for slug, image_url in PROGRAM_IMAGES.items():
+            result = await db.execute(select(Program).where(Program.slug == slug))
+            program = result.scalar_one_or_none()
+            if program and not program.cover_image_url:
+                program.cover_image_url = image_url
                 updated += 1
+                print(f"[+] {slug}")
+            elif program and program.cover_image_url:
+                print(f"[~] {slug} already has image")
+            else:
+                print(f"[!] {slug} not found")
 
         await db.commit()
-        print(f"Enriched {updated} programs.")
+        print(f"\nEnriched {updated} programs.")
 
 
 if __name__ == "__main__":
