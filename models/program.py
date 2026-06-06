@@ -78,6 +78,8 @@ class Program(Base):
     cons: Mapped[str | None] = mapped_column(Text, nullable=True)
     career_opportunities: Mapped[str | None] = mapped_column(Text, nullable=True)
     cover_image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    cover_image_url_2: Mapped[str | None] = mapped_column(String(500), nullable=True)
+cover_image_url_3: Mapped[str | None] = mapped_column(String(500), nullable=True)
     is_published: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     views_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 

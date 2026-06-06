@@ -8,6 +8,8 @@ async def create_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         new_columns = [
+        'ALTER TABLE programs ADD COLUMN IF NOT EXISTS cover_image_url_2 VARCHAR(500)',
+'ALTER TABLE programs ADD COLUMN IF NOT EXISTS cover_image_url_3 VARCHAR(500)',
         'ALTER TABLE countries ADD COLUMN IF NOT EXISTS image_url VARCHAR(500)',
             'ALTER TABLE programs ADD COLUMN IF NOT EXISTS university_id INTEGER',
             'ALTER TABLE programs ADD COLUMN IF NOT EXISTS university_name VARCHAR',
