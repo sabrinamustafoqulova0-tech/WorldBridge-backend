@@ -81,8 +81,11 @@ async def get_program(
     db: AsyncSession = Depends(get_db),
 ):
     """Get a single published program by its slug. Increments view counter."""
+    from sqlalchemy.orm import selectinload
     result = await db.execute(
-        select(Program).where(Program.slug == slug, Program.is_published.is_(True))
+        select(Program)
+        .options(selectinload(Program.images), selectinload(Program.university))
+        .where(Program.slug == slug, Program.is_published.is_(True))
     )
     program = result.scalar_one_or_none()
     if not program:
@@ -90,7 +93,11 @@ async def get_program(
     program.views_count += 1
     await db.flush()
     await db.refresh(program)
-    return ProgramResponse.model_validate(localize(program, lang, PROGRAM_I18N_FIELDS))
+    # Build localized dict and inject relationship data
+    data = localize(program, lang, PROGRAM_I18N_FIELDS)
+    data["images"] = program.images or []
+    data["university"] = program.university
+    return ProgramResponse.model_validate(data)
 
 
 @router.post("", response_model=ProgramResponse, status_code=status.HTTP_201_CREATED)

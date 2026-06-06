@@ -7,6 +7,9 @@ from models.country import Country
 from models.faq import FAQ
 from models.ai_chat import AIChatMessage
 from models.program_suggestion import ProgramSuggestion, SuggestionStatus
+from models.university import University
+from models.program_image import ProgramImage, ImageType
+from models.data_sync_log import DataSyncLog, SyncStatus
 
 __all__ = [
     "User",
@@ -21,4 +24,9 @@ __all__ = [
     "AIChatMessage",
     "ProgramSuggestion",
     "SuggestionStatus",
+    "University",
+    "ProgramImage",
+    "ImageType",
+    "DataSyncLog",
+    "SyncStatus",
 ]

@@ -12,4 +12,6 @@ async def create_tables():
 asyncio.run(create_tables())
 "
 python seed_all.py
+python seed_universities.py
+python seed_programs_enriched.py
 uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4

@@ -1,9 +1,11 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel
 
 from models.program import ProgramCategory, ProgramLevel
+from schemas.program_image import ProgramImageResponse
+from schemas.university import UniversityResponse
 
 
 # ── Base ──────────────────────────────────────────────────────────────────────
@@ -30,6 +32,25 @@ class ProgramBase(BaseModel):
     cons: Optional[str] = None
     career_opportunities: Optional[str] = None
     cover_image_url: Optional[str] = None
+
+    # ── Enrichment fields (all nullable) ─────────────────────────────────────
+    university_id: Optional[int] = None
+    university_name: Optional[str] = None
+    city: Optional[str] = None
+    tuition_fee: Optional[str] = None
+    tuition_currency: Optional[str] = None
+    accommodation_cost: Optional[str] = None
+    language_course_cost: Optional[str] = None
+    scholarship_available: Optional[bool] = False
+    scholarship_amount: Optional[str] = None
+    contact_email: Optional[str] = None
+    contact_phone: Optional[str] = None
+    university_address: Optional[str] = None
+    program_page_url: Optional[str] = None
+    application_steps: Optional[str] = None
+    program_faq: Optional[str] = None
+    data_source: Optional[str] = None
+    last_synced_at: Optional[datetime] = None
 
 
 # ── Create / Update ───────────────────────────────────────────────────────────
@@ -79,6 +100,23 @@ class ProgramUpdate(BaseModel):
     career_opportunities: Optional[str] = None
     cover_image_url: Optional[str] = None
     is_published: Optional[bool] = None
+    # Enrichment fields
+    university_id: Optional[int] = None
+    university_name: Optional[str] = None
+    city: Optional[str] = None
+    tuition_fee: Optional[str] = None
+    tuition_currency: Optional[str] = None
+    accommodation_cost: Optional[str] = None
+    language_course_cost: Optional[str] = None
+    scholarship_available: Optional[bool] = None
+    scholarship_amount: Optional[str] = None
+    contact_email: Optional[str] = None
+    contact_phone: Optional[str] = None
+    university_address: Optional[str] = None
+    program_page_url: Optional[str] = None
+    application_steps: Optional[str] = None
+    program_faq: Optional[str] = None
+    data_source: Optional[str] = None
 
 
 # ── Public response (visible without auth) ────────────────────────────────────
@@ -110,6 +148,10 @@ class ProgramPublicResponse(BaseModel):
     views_count: int
     created_at: datetime
     updated_at: datetime
+    # Lightweight enrichment for cards
+    university_name: Optional[str] = None
+    city: Optional[str] = None
+    scholarship_available: Optional[bool] = False
 
     model_config = {"from_attributes": True}
 
@@ -132,6 +174,9 @@ class ProgramResponse(ProgramBase):
     description_tg: Optional[str] = None
     full_description_en: Optional[str] = None
     full_description_tg: Optional[str] = None
+    # Nested relations
+    images: List[ProgramImageResponse] = []
+    university: Optional[UniversityResponse] = None
 
     model_config = {"from_attributes": True}
 

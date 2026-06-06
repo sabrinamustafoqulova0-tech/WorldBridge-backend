@@ -5,6 +5,7 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     Enum,
+    ForeignKey,
     Integer,
     String,
     Text,
@@ -80,6 +81,39 @@ class Program(Base):
     is_published: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     views_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
+    # ── New enrichment fields (added via ALTER TABLE on startup) ──────────────
+    # University linkage
+    university_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("universities.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    university_name: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    city: Mapped[str | None] = mapped_column(String(100), nullable=True)
+
+    # Cost details — store as formatted strings (e.g. "€500/semester", "free")
+    # Never invent values; leave null if not verified from official source
+    tuition_fee: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    tuition_currency: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    accommodation_cost: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    language_course_cost: Mapped[str | None] = mapped_column(String(200), nullable=True)
+
+    # Scholarship info
+    scholarship_available: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
+    scholarship_amount: Mapped[str | None] = mapped_column(String(200), nullable=True)
+
+    # Contact info — only from verified official contact pages
+    contact_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    contact_phone: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    university_address: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    program_page_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
+    # Structured content
+    application_steps: Mapped[str | None] = mapped_column(Text, nullable=True)  # newline-separated
+    program_faq: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON: [{q,a}, …]
+
+    # Sync metadata
+    data_source: Mapped[str | None] = mapped_column(String(50), nullable=True, default="manual")
+    last_synced_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -93,6 +127,17 @@ class Program(Base):
     # Relationships
     favorites = relationship("Favorite", back_populates="program", cascade="all, delete-orphan")
     checklist_items = relationship("ChecklistItem", back_populates="program", cascade="all, delete-orphan")
+    images = relationship(
+        "ProgramImage", back_populates="program",
+        cascade="all, delete-orphan",
+        order_by="ProgramImage.display_order",
+        lazy="noload",
+    )
+    university = relationship(
+        "University", back_populates="programs",
+        foreign_keys=[university_id],
+        lazy="noload",
+    )
 
     def __repr__(self) -> str:
         return f"<Program id={self.id} slug={self.slug!r} country={self.country_slug}>"

@@ -29,7 +29,11 @@ from database import Base, engine
 import models  # noqa: F401 — загружаем все модели в Base.metadata
 
 # All feature routers
-from routers import auth, articles, calculator, checklists, countries, favorites, programs, users, ai_consultant, suggestions
+from routers import (
+    auth, articles, calculator, checklists, countries, favorites,
+    programs, users, ai_consultant, suggestions,
+    universities, program_images, admin_sync,
+)
 
 
 # ── Lifespan (startup / shutdown) ─────────────────────────────────────────────
@@ -58,10 +62,31 @@ _I18N_COLUMNS: list[tuple[str, str, str]] = [
     ("countries", "description_tg",       "TEXT"),
 ]
 
+# New enrichment columns for programs table
+_NEW_COLUMNS: list[tuple[str, str, str]] = [
+    ("programs", "university_id",        "INTEGER"),
+    ("programs", "university_name",      "TEXT"),
+    ("programs", "city",                 "TEXT"),
+    ("programs", "tuition_fee",          "TEXT"),
+    ("programs", "tuition_currency",     "TEXT"),
+    ("programs", "accommodation_cost",   "TEXT"),
+    ("programs", "language_course_cost", "TEXT"),
+    ("programs", "scholarship_available","INTEGER"),
+    ("programs", "scholarship_amount",   "TEXT"),
+    ("programs", "contact_email",        "TEXT"),
+    ("programs", "contact_phone",        "TEXT"),
+    ("programs", "university_address",   "TEXT"),
+    ("programs", "program_page_url",     "TEXT"),
+    ("programs", "application_steps",    "TEXT"),
+    ("programs", "program_faq",          "TEXT"),
+    ("programs", "data_source",          "TEXT"),
+    ("programs", "last_synced_at",       "DATETIME"),
+]
+
 
 async def _apply_i18n_migrations(conn) -> None:
-    """Safely add i18n columns to existing tables (idempotent)."""
-    for table, column, col_type in _I18N_COLUMNS:
+    """Safely add i18n and enrichment columns to existing tables (idempotent)."""
+    for table, column, col_type in _I18N_COLUMNS + _NEW_COLUMNS:
         try:
             await conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {col_type}"))
         except Exception:
@@ -141,6 +166,9 @@ def create_app() -> FastAPI:
     app.include_router(checklists.router,     prefix=PREFIX)   # /api/v1/checklists
     app.include_router(ai_consultant.router,  prefix=PREFIX)   # /api/v1/ai
     app.include_router(suggestions.router,    prefix=PREFIX)   # /api/v1/suggestions
+    app.include_router(universities.router,   prefix=PREFIX)   # /api/v1/universities
+    app.include_router(program_images.router, prefix=PREFIX)   # /api/v1/programs/{slug}/images
+    app.include_router(admin_sync.router,     prefix=PREFIX)   # /api/v1/admin/sync
 
     # ── Health check ──────────────────────────────────────────────────────────
 
