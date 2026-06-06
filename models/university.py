@@ -21,11 +21,14 @@ class University(Base):
     city: Mapped[str | None] = mapped_column(String(100), nullable=True)
     address: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
+
+
+
     website_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     logo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
-image_url_2: Mapped[str | None] = mapped_column(String(500), nullable=True)
-image_url_3: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    image_url_2: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    image_url_3: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     # Contact — only populate from verified official contact pages
     email: Mapped[str | None] = mapped_column(String(255), nullable=True)
