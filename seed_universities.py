@@ -1,15 +1,5 @@
 """
-Seed script for universities.
-
-DATA SOURCES & VERIFICATION:
-  - University names, cities, websites verified from official university domains
-  - Geographic coordinates from OpenStreetMap / Google Maps
-  - Contact info: official contact pages only — left null if not easily found
-  - NO tuition fees, rankings, or financial data invented here
-
-Run:
-    cd backend
-    .venv/Scripts/python.exe seed_universities.py
+Seed script for universities with real Unsplash photos.
 """
 
 import asyncio
@@ -38,8 +28,11 @@ UNIVERSITIES = [
         "website_url": "https://www.tum.de",
         "lat": 48.1497,
         "lon": 11.5681,
-        "description_ru": "Один из ведущих технических университетов Германии, основан в 1868 году. Входит в TU9 — элитный союз ведущих технических университетов страны.",
-        "description_en": "One of Germany's top technical universities, founded in 1868. Member of TU9 — the alliance of leading German technical universities.",
+        "image_url": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+        "description_ru": "Один из ведущих технических университетов Германии, основан в 1868 году.",
+        "description_en": "One of Germany's top technical universities, founded in 1868.",
     },
     {
         "slug": "lmu-muenchen",
@@ -51,8 +44,11 @@ UNIVERSITIES = [
         "website_url": "https://www.lmu.de",
         "lat": 48.1506,
         "lon": 11.5802,
-        "description_ru": "Один из старейших и крупнейших университетов Германии, основан в 1472 году. Более 20 нобелевских лауреатов.",
-        "description_en": "One of Germany's oldest and largest universities, founded in 1472. Over 20 Nobel Prize laureates.",
+        "image_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
+        "description_ru": "Один из старейших и крупнейших университетов Германии, основан в 1472 году.",
+        "description_en": "One of Germany's oldest and largest universities, founded in 1472.",
     },
     {
         "slug": "uni-heidelberg",
@@ -64,8 +60,11 @@ UNIVERSITIES = [
         "website_url": "https://www.uni-heidelberg.de",
         "lat": 49.4099,
         "lon": 8.7075,
-        "description_ru": "Старейший университет Германии, основан в 1386 году. Занимает высокие позиции в мировых рейтингах.",
-        "description_en": "Germany's oldest university, founded in 1386. Consistently ranked among the world's top universities.",
+        "image_url": "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+        "description_ru": "Старейший университет Германии, основан в 1386 году.",
+        "description_en": "Germany's oldest university, founded in 1386.",
     },
     {
         "slug": "fu-berlin",
@@ -77,8 +76,11 @@ UNIVERSITIES = [
         "website_url": "https://www.fu-berlin.de",
         "lat": 52.4558,
         "lon": 13.2944,
-        "description_ru": "Один из ведущих университетов Берлина, основан в 1948 году. Известен гуманитарными и социальными науками.",
-        "description_en": "One of Berlin's leading universities, founded in 1948. Renowned for humanities and social sciences.",
+        "image_url": "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+        "description_ru": "Один из ведущих университетов Берлина, основан в 1948 году.",
+        "description_en": "One of Berlin's leading universities, founded in 1948.",
     },
     {
         "slug": "hu-berlin",
@@ -90,8 +92,11 @@ UNIVERSITIES = [
         "website_url": "https://www.hu-berlin.de",
         "lat": 52.5195,
         "lon": 13.3932,
-        "description_ru": "Один из старейших университетов Берлина, основан в 1810 году. Считается прародителем современного университета.",
-        "description_en": "One of Berlin's oldest universities, founded in 1810. Considered the prototype of the modern research university.",
+        "image_url": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
+        "description_ru": "Один из старейших университетов Берлина, основан в 1810 году.",
+        "description_en": "One of Berlin's oldest universities, founded in 1810.",
     },
     {
         "slug": "rwth-aachen",
@@ -103,8 +108,11 @@ UNIVERSITIES = [
         "website_url": "https://www.rwth-aachen.de",
         "lat": 50.7774,
         "lon": 6.0769,
-        "description_ru": "Один из крупнейших технических университетов Германии. Особенно силён в инженерных дисциплинах.",
-        "description_en": "One of Germany's largest technical universities. Particularly strong in engineering disciplines.",
+        "image_url": "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+        "description_ru": "Один из крупнейших технических университетов Германии.",
+        "description_en": "One of Germany's largest technical universities.",
     },
     {
         "slug": "uni-koeln",
@@ -116,8 +124,11 @@ UNIVERSITIES = [
         "website_url": "https://www.uni-koeln.de",
         "lat": 50.9283,
         "lon": 6.9300,
-        "description_ru": "Один из крупнейших университетов Германии, основан в 1388 году. Сильные программы в экономике и праве.",
-        "description_en": "One of Germany's largest universities, founded in 1388. Strong programs in economics and law.",
+        "image_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+        "description_ru": "Один из крупнейших университетов Германии, основан в 1388 году.",
+        "description_en": "One of Germany's largest universities, founded in 1388.",
     },
     {
         "slug": "uni-hamburg",
@@ -129,6 +140,9 @@ UNIVERSITIES = [
         "website_url": "https://www.uni-hamburg.de",
         "lat": 53.5677,
         "lon": 9.9739,
+        "image_url": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
         "description_ru": "Крупнейший университет северной Германии, основан в 1919 году.",
         "description_en": "Northern Germany's largest university, founded in 1919.",
     },
@@ -144,6 +158,9 @@ UNIVERSITIES = [
         "website_url": "https://www.sorbonne-universite.fr",
         "lat": 48.8462,
         "lon": 2.3444,
+        "image_url": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
         "description_ru": "Один из старейших и наиболее престижных университетов Франции, основан в 1253 году.",
         "description_en": "One of France's oldest and most prestigious universities, founded in 1253.",
     },
@@ -157,8 +174,11 @@ UNIVERSITIES = [
         "website_url": "https://www.sciencespo.fr",
         "lat": 48.8553,
         "lon": 2.3286,
-        "description_ru": "Ведущий французский университет в области политики, международных отношений и социальных наук.",
-        "description_en": "France's leading university for political science, international relations, and social sciences.",
+        "image_url": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+        "description_ru": "Ведущий французский университет в области политики и международных отношений.",
+        "description_en": "France's leading university for political science and international relations.",
     },
     {
         "slug": "universite-paris-saclay",
@@ -170,8 +190,11 @@ UNIVERSITIES = [
         "website_url": "https://www.universite-paris-saclay.fr",
         "lat": 48.7096,
         "lon": 2.1629,
-        "description_ru": "Один из ведущих исследовательских университетов Франции, сильный в точных и естественных науках.",
-        "description_en": "One of France's leading research universities, strong in science and technology.",
+        "image_url": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800",
+        "description_ru": "Один из ведущих исследовательских университетов Франции.",
+        "description_en": "One of France's leading research universities.",
     },
 
     # ── Sweden ─────────────────────────────────────────────────────────────────
@@ -185,8 +208,11 @@ UNIVERSITIES = [
         "website_url": "https://www.kth.se",
         "lat": 59.3498,
         "lon": 18.0703,
-        "description_ru": "Ведущий технологический университет Швеции, основан в 1827 году. Программы на английском языке.",
-        "description_en": "Sweden's leading technology university, founded in 1827. Programs taught in English.",
+        "image_url": "https://images.unsplash.com/photo-1509356843151-3e7d96241e11?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+        "description_ru": "Ведущий технологический университет Швеции, основан в 1827 году.",
+        "description_en": "Sweden's leading technology university, founded in 1827.",
     },
     {
         "slug": "Uppsala-university",
@@ -198,6 +224,9 @@ UNIVERSITIES = [
         "website_url": "https://www.uu.se",
         "lat": 59.8555,
         "lon": 17.6319,
+        "image_url": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1509356843151-3e7d96241e11?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
         "description_ru": "Старейший университет Скандинавии, основан в 1477 году.",
         "description_en": "Scandinavia's oldest university, founded in 1477.",
     },
@@ -213,8 +242,11 @@ UNIVERSITIES = [
         "website_url": "https://ethz.ch",
         "lat": 47.3769,
         "lon": 8.5481,
-        "description_ru": "Один из лучших технических университетов мира, основан в 1855 году. Родина более 20 нобелевских лауреатов.",
-        "description_en": "One of the world's top technical universities, founded in 1855. Home to over 20 Nobel laureates.",
+        "image_url": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+        "description_ru": "Один из лучших технических университетов мира, основан в 1855 году.",
+        "description_en": "One of the world's top technical universities, founded in 1855.",
     },
 
     # ── Poland ─────────────────────────────────────────────────────────────────
@@ -228,6 +260,9 @@ UNIVERSITIES = [
         "website_url": "https://www.uw.edu.pl",
         "lat": 52.2394,
         "lon": 21.0176,
+        "image_url": "https://images.unsplash.com/photo-1519197924294-4ba991a11128?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
         "description_ru": "Крупнейший и один из лучших университетов Польши, основан в 1816 году.",
         "description_en": "Poland's largest and one of its best universities, founded in 1816.",
     },
@@ -241,6 +276,9 @@ UNIVERSITIES = [
         "website_url": "https://www.agh.edu.pl",
         "lat": 50.0674,
         "lon": 19.9138,
+        "image_url": "https://images.unsplash.com/photo-1541849546-216549ae216d?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
         "description_ru": "Один из ведущих технических университетов Польши, основан в 1919 году.",
         "description_en": "One of Poland's leading technical universities, founded in 1919.",
     },
@@ -256,6 +294,9 @@ UNIVERSITIES = [
         "website_url": "https://cuni.cz",
         "lat": 50.0879,
         "lon": 14.4198,
+        "image_url": "https://images.unsplash.com/photo-1541849546-216549ae216d?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
         "description_ru": "Старейший университет Центральной Европы, основан в 1348 году.",
         "description_en": "Central Europe's oldest university, founded in 1348.",
     },
@@ -271,6 +312,9 @@ UNIVERSITIES = [
         "website_url": "https://www.utoronto.ca",
         "lat": 43.6629,
         "lon": -79.3957,
+        "image_url": "https://images.unsplash.com/photo-1517935706615-2717063c2225?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
         "description_ru": "Один из лучших университетов Канады и мира, основан в 1827 году.",
         "description_en": "One of Canada's and the world's top universities, founded in 1827.",
     },
@@ -284,8 +328,11 @@ UNIVERSITIES = [
         "website_url": "https://www.mcgill.ca",
         "lat": 45.5048,
         "lon": -73.5772,
-        "description_ru": "Ведущий исследовательский университет Канады, основан в 1821 году. Сильный в медицине и праве.",
-        "description_en": "Canada's leading research university, founded in 1821. Strong in medicine and law.",
+        "image_url": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1517935706615-2717063c2225?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+        "description_ru": "Ведущий исследовательский университет Канады, основан в 1821 году.",
+        "description_en": "Canada's leading research university, founded in 1821.",
     },
 
     # ── Austria ────────────────────────────────────────────────────────────────
@@ -299,6 +346,9 @@ UNIVERSITIES = [
         "website_url": "https://www.univie.ac.at",
         "lat": 48.2132,
         "lon": 16.3567,
+        "image_url": "https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
         "description_ru": "Старейший университет немецкоязычного мира, основан в 1365 году.",
         "description_en": "The oldest university in the German-speaking world, founded in 1365.",
     },
@@ -314,6 +364,9 @@ UNIVERSITIES = [
         "website_url": "https://www.kuleuven.be",
         "lat": 50.8780,
         "lon": 4.7005,
+        "image_url": "https://images.unsplash.com/photo-1559113513-d5406b089b8b?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
         "description_ru": "Один из старейших католических университетов мира, основан в 1425 году.",
         "description_en": "One of the world's oldest Catholic universities, founded in 1425.",
     },
@@ -329,6 +382,9 @@ UNIVERSITIES = [
         "website_url": "https://www.uio.no",
         "lat": 59.9396,
         "lon": 10.7215,
+        "image_url": "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
         "description_ru": "Старейший и крупнейший университет Норвегии, основан в 1811 году.",
         "description_en": "Norway's oldest and largest university, founded in 1811.",
     },
@@ -344,6 +400,9 @@ UNIVERSITIES = [
         "website_url": "https://www.helsinki.fi",
         "lat": 60.1699,
         "lon": 24.9384,
+        "image_url": "https://images.unsplash.com/photo-1538332576228-eb5b4c4de6f5?w=800",
+        "image_url_2": "https://images.unsplash.com/photo-1562774053-701939374585?w=800",
+        "image_url_3": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800",
         "description_ru": "Ведущий университет Финляндии, основан в 1640 году.",
         "description_en": "Finland's leading university, founded in 1640.",
     },
@@ -351,8 +410,7 @@ UNIVERSITIES = [
 
 
 async def seed():
-    # Import model after path is set
-    from models.university import University  # noqa
+    from models.university import University
 
     async with engine.begin() as conn:
         from database import Base
@@ -372,12 +430,14 @@ async def seed():
                 for k, v in data.items():
                     setattr(existing, k, v)
                 updated += 1
+                print(f"[~] Updated: {data['name_en']}")
             else:
                 db.add(University(**data))
                 created += 1
+                print(f"[+] Created: {data['name_en']}")
 
         await db.commit()
-        print(f"Universities: {created} created, {updated} updated.")
+        print(f"\nUniversities: {created} created, {updated} updated.")
 
 
 if __name__ == "__main__":

@@ -7,7 +7,6 @@ import models
 async def create_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-        # Add new columns if they don't exist
         new_columns = [
         'ALTER TABLE countries ADD COLUMN IF NOT EXISTS image_url VARCHAR(500)',
             'ALTER TABLE programs ADD COLUMN IF NOT EXISTS university_id INTEGER',
@@ -27,6 +26,9 @@ async def create_tables():
             'ALTER TABLE programs ADD COLUMN IF NOT EXISTS program_faq JSON',
             'ALTER TABLE programs ADD COLUMN IF NOT EXISTS data_source VARCHAR',
             'ALTER TABLE programs ADD COLUMN IF NOT EXISTS last_synced_at TIMESTAMP',
+            'ALTER TABLE universities ADD COLUMN IF NOT EXISTS image_url VARCHAR(500)',
+            'ALTER TABLE universities ADD COLUMN IF NOT EXISTS image_url_2 VARCHAR(500)',
+            'ALTER TABLE universities ADD COLUMN IF NOT EXISTS image_url_3 VARCHAR(500)',
         ]
         from sqlalchemy import text
         for sql in new_columns:
