@@ -10,6 +10,7 @@ from models.program_suggestion import ProgramSuggestion, SuggestionStatus
 from models.university import University
 from models.program_image import ProgramImage, ImageType
 from models.data_sync_log import DataSyncLog, SyncStatus
+from models.external_scholarship import ExternalScholarship, ScholarshipCategory
 
 __all__ = [
     "User",
@@ -29,4 +30,6 @@ __all__ = [
     "ImageType",
     "DataSyncLog",
     "SyncStatus",
+    "ExternalScholarship",
+    "ScholarshipCategory",
 ]

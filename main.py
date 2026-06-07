@@ -32,7 +32,7 @@ import models  # noqa: F401 — загружаем все модели в Base.m
 from routers import (
     auth, articles, calculator, checklists, countries, favorites,
     programs, users, ai_consultant, suggestions,
-    universities, program_images, admin_sync,
+    universities, program_images, admin_sync, scholarships,
 )
 
 
@@ -169,6 +169,7 @@ def create_app() -> FastAPI:
     app.include_router(universities.router,   prefix=PREFIX)   # /api/v1/universities
     app.include_router(program_images.router, prefix=PREFIX)   # /api/v1/programs/{slug}/images
     app.include_router(admin_sync.router,     prefix=PREFIX)   # /api/v1/admin/sync
+    app.include_router(scholarships.router,   prefix=PREFIX)   # /api/v1/scholarships
 
     # ── Health check ──────────────────────────────────────────────────────────
 

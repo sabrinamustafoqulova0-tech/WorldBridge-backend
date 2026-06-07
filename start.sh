@@ -42,6 +42,18 @@ async def create_tables():
 
 asyncio.run(create_tables())
 "
+python -c "
+import asyncio
+from database import AsyncSessionLocal
+from services.scholarship_tracker import sync_all_sources
+
+async def main():
+    async with AsyncSessionLocal() as db:
+        results = await sync_all_sources(db)
+        print('[startup] scholarship sync:', results)
+
+asyncio.run(main())
+" || echo '[startup] scholarship sync skipped (non-fatal)'
 python seed_all.py
 python seed_universities.py
 python seed_programs_enriched.py
