@@ -27,14 +27,17 @@ async def list_programs(
     page: int = Query(1, ge=1),
     size: int = Query(12, ge=1, le=100),
     category: Optional[ProgramCategory] = None,
+    country_slug: Optional[str] = Query(None, max_length=20),
     search: Optional[str] = Query(None, max_length=100),
     lang: str = Query(default="ru"),
     db: AsyncSession = Depends(get_db),
 ):
-    """List published programs with optional category filter and full-text search."""
+    """List published programs with optional category and country filters."""
     base = select(Program).where(Program.is_published.is_(True))
     if category:
         base = base.where(Program.category == category)
+    if country_slug:
+        base = base.where(Program.country_slug == country_slug)
     if search:
         p = f"%{search}%"
         base = base.where(
