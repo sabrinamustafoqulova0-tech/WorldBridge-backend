@@ -54,5 +54,13 @@ class Settings(BaseSettings):
     # ── Groq AI ──────────────────────────────────────────────────────────
     GROQ_API_KEY: str = ""
 
+    # ── Google OAuth ─────────────────────────────────────────────────────
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+
+    # ── URLs ─────────────────────────────────────────────────────────────
+    FRONTEND_URL: str = "https://worldbridge-frontend.netlify.app"
+    BACKEND_URL: str = "http://localhost:8000"
+
 
 settings = Settings()
